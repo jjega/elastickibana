@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  server-node:
+    image: efashionparis/node:latest
+    ports:
+    - "3000:3000"
+    links:
+    - db:db
+    - elastic:elastic
+    volumes:
+    - ~/www/javascript/elastic:/var/www/server
+  elastic:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.6.0
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "9500:9200"
+      - "9600:9300"
+  db:
+    image: mysql:5.5
+    volumes:
+    - ~/mysql:/var/lib/mysql
+    - ~/Downloads/dbinit.sql:/docker-entrypoint-initdb.d/dump.sql
+    ports:
+    - "3306:3306"
+    environment:
+    - MYSQL_ROOT_PASSWORD=root
+    - MYSQL_DATABASE=efashionparis
+  myadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+    - "8080:80"
+    links:
+    - db:db
